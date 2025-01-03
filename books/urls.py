@@ -5,7 +5,7 @@ from books.views import BookViewSet
 
 router = routers.DefaultRouter()
 router.register("books", BookViewSet)
-app_name = 'books'
+app_name = "books"
 urlpatterns = [
     path("", include(router.urls)),
 ]

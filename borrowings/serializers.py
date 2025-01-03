@@ -9,10 +9,8 @@ from borrowings.models import Borrowing
 
 class BorrowingReadSerializer(serializers.ModelSerializer):
     book = BookDetailSerializer(read_only=True)
-    user = serializers.CharField(
-        read_only=True,
-        source="user.email"
-    )
+    user = serializers.CharField(read_only=True, source="user.email")
+
     class Meta:
         model = Borrowing
         fields = (
@@ -57,6 +55,7 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
         book.save()
         return borrowing
 
+
 class BorrowingReturnSerializer(serializers.ModelSerializer):
     class Meta:
         model = Borrowing
@@ -67,9 +66,7 @@ class BorrowingReturnSerializer(serializers.ModelSerializer):
         borrowing = self.instance
 
         if borrowing.actual_return_date:
-            raise ValidationError(
-                f"Borrowing {borrowing.id} already returned"
-            )
+            raise ValidationError(f"Borrowing {borrowing.id} already returned")
         return data
 
     def update(self, instance, validated_data):
