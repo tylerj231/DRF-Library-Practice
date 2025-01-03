@@ -1,4 +1,3 @@
-
 from rest_framework import serializers
 
 from books.models import Book
@@ -14,6 +13,7 @@ class BookSerializer(serializers.ModelSerializer):
             "inventory",
         )
 
+
 class BookListSerializers(serializers.ModelSerializer):
     class Meta:
         model = Book
@@ -23,6 +23,7 @@ class BookListSerializers(serializers.ModelSerializer):
             "author",
             "inventory",
         )
+
 
 class BookDetailSerializer(BookListSerializers):
     class Meta:
