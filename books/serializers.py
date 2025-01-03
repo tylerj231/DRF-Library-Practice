@@ -22,6 +22,7 @@ class BookListSerializers(serializers.ModelSerializer):
             "title",
             "author",
             "inventory",
+            "cover"
         )
 
 
