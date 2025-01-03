@@ -6,9 +6,12 @@ from books.models import Book
 
 
 class Borrowing(models.Model):
-    borrow_date = models.DateField()
+    borrow_date = models.DateField(auto_now_add=True)
     expected_return_date = models.DateField()
-    actual_return_date = models.DateField(null=True, blank=True)
+    actual_return_date = models.DateField(
+        null=True,
+        blank=True
+    )
     book = models.ForeignKey(
         Book,
         on_delete=models.CASCADE,
@@ -19,27 +22,28 @@ class Borrowing(models.Model):
         on_delete=models.CASCADE,
         related_name='borrowers'
     )
-
-    @property
-    def is_active(self):
-        if self.actual_return_date is None:
-            return True
+    is_active = models.BooleanField(default=True)
 
     class Meta:
-        unique_together = ("borrow_date", "actual_return_date")
+        unique_together = ("user", "book")
+
+    @staticmethod
+    def validate_inventory(inventory, error_to_raise, ):
+        if inventory == 0:
+            raise error_to_raise(
+                {"book":
+                     "The book is out of stock."
+                     " In order to create or borrow book,"
+                     " there has to be at least one copy"
+                 }
+            )
 
     def clean(self):
-        if self.book.inventory <= 0:
-            return ValidationError("Current book is out of stock")
+        self.validate_inventory(
+            self.book.inventory,
+            error_to_raise=ValidationError
+        )
 
     def save(self, *args, **kwargs):
-        with transaction.atomic():
-            if not self.id:
-                self.full_clean()
-                self.book.inventory -= 1
-                self.book.save()
-
-            elif self.id and self.actual_return_date:
-                self.book.inventory += 1
-                self.book.save()
-        super().save(*args, **kwargs)
+        self.clean()
+        return super().save(*args, **kwargs)
